@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
 
 std::string tobinary(std::string decimal) {
     try {
-        std::regex ip_regex (R"(((\d){1,3})\.((\d){1,3})\.((\d){1,3})\.((\d){1,3}))");
+        std::regex ip_regex (R"(([1](\d\d)|(2\d\d)|(\d?\d))\.([1](\d\d)|(2\d\d)|(\d?\d))\.([1](\d\d)|(2\d\d)|(\d?\d))\.([1](\d\d)|(2\d\d)|(\d?\d)))");
         if (std::regex_match(decimal, ip_regex)) {
             std::string output;
             std::string ipbinary[4];
@@ -81,11 +81,7 @@ std::string tobinary(std::string decimal) {
             }
             return output;
         } else {
-            std::string man_main = "Usage: \n"
-                                   "\t --binary -b <ip>            Translating your ip address into binary view.\n"
-                                   "\t --decimal -d <binary_ip>    Translating your binary id address into decimal view.\n";
-            std::cout << man_main;
-            exit (-1);
+            throw std::runtime_error("Incorrect ip address");
         }
     } catch (std::regex_error &regexError) {
         std::cout << regexError.what();
@@ -96,7 +92,7 @@ std::string tobinary(std::string decimal) {
 
 std::string todecimal(std::string binary) {
     try {
-        std::regex ip_regex (R"(([01]+)\.([01]+)\.([01]+)\.([01]+))");
+        std::regex ip_regex (R"([01]{8}\.[01]{8}\.[01]{8}\.[01]{8})");
         if (std::regex_match(binary, ip_regex)) {
             std::string output;
             std::string ipbinary[4];
@@ -118,6 +114,8 @@ std::string todecimal(std::string binary) {
                 }
             }
             return output;
+        } else {
+            throw std::runtime_error("Incorrect binary ip address");
         }
     } catch (std::regex_error &ex) {
         std::cout << ex.what();
