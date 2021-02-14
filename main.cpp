@@ -3,8 +3,9 @@
 #include <regex>
 #include <cmath>
 
-std::string tobinary(std::string decimal);
-std::string todecimal(std::string binary);
+std::string tobinary(const std::string& decimal);
+std::string todecimal(const std::string& binary);
+std::string bigint(const std::string& decimal);
 
 int main(int argc, char* argv[]) {
 
@@ -22,10 +23,15 @@ int main(int argc, char* argv[]) {
             exit (0);
         }
 
-        std::string man_main = "Incorrect usage.\n"
-                               "Usage: \n"
+        if (arg1 == "--bigint") {
+            std::cout << bigint(arg2);
+            exit(0);
+        }
+
+        std::string man_main = "Usage: \n"
                                "\t --binary -b <ip>            Translating your ip address into binary view.\n"
-                               "\t --decimal -d <binary_ip>    Translating your binary id address into decimal view.\n";
+                               "\t --decimal -d <binary_ip>    Translating your binary id address into decimal view.\n"
+                               "\t --bigint <ip>               The assignment itself. <ip> is a decimal ip, which will be converted into a glued binary and decimal number\n";
         std::cout << man_main;
         return 0;
     }
@@ -37,7 +43,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-std::string tobinary(std::string decimal) {
+std::string tobinary(const std::string& decimal) {
     try {
         std::regex ip_regex (R"(([1](\d\d)|(2\d\d)|(\d?\d))\.([1](\d\d)|(2\d\d)|(\d?\d))\.([1](\d\d)|(2\d\d)|(\d?\d))\.([1](\d\d)|(2\d\d)|(\d?\d)))");
         if (std::regex_match(decimal, ip_regex)) {
@@ -90,7 +96,7 @@ std::string tobinary(std::string decimal) {
     return "";
 }
 
-std::string todecimal(std::string binary) {
+std::string todecimal(const std::string& binary) {
     try {
         std::regex ip_regex (R"([01]{8}\.[01]{8}\.[01]{8}\.[01]{8})");
         if (std::regex_match(binary, ip_regex)) {
@@ -122,4 +128,20 @@ std::string todecimal(std::string binary) {
     }
 
     return "";
+}
+
+std::string bigint(const std::string& decimal) {
+    std::string binary_ip = tobinary(decimal);
+    std::string output;
+    binary_ip.erase(std::remove(binary_ip.begin(), binary_ip.end(), '.'), binary_ip.end());
+    output += binary_ip;
+
+    unsigned int converted_number = 0;
+    for (int i = 0; i < binary_ip.length(); ++i) {
+        std::string digit = binary_ip.substr(i, 1);
+        converted_number += std::stoi(digit) * (unsigned int)pow(2, 31 - i);
+    }
+
+    output += "\n" + std::to_string(converted_number);
+    return output;
 }
